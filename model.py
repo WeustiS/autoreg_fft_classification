@@ -10,8 +10,8 @@ class Model(nn.Module):
     def __init__(self, tok_dim, dim, num_classes, max_tok, dropout=0.):
         super().__init__()
         self.to_tok = nn.Linear(tok_dim, dim)
-        encoder_layer = nn.TransformerEncoderLayer(d_model=dim, nhead=8, activation='gelu', batch_first=True, norm_first=True)
-        self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=6)
+        encoder_layer = nn.TransformerEncoderLayer(d_model=dim, nhead=4, activation='gelu', batch_first=True, norm_first=True)
+        self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=4)
         self.fc = nn.Linear(dim, num_classes)
         
         self.cls_token = nn.Parameter(torch.zeros(1, dim))

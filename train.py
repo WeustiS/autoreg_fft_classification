@@ -12,7 +12,7 @@ from utils import seed_everything, accuracy
 if CONFIG["wandb"]:
     import wandb
     wandb.init(project="cs598", config=CONFIG)
-seed_everything(42)
+seed_everything(41)
           
 dims = [1, 2, 3, 6, 11, 12, 24, 33, 48, 64, 66, 96, 132, 192, 264, 352, 528, 704, 1056, 2112]
 assert CONFIG['dim'] in dims

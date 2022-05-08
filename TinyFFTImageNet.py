@@ -21,7 +21,7 @@ class TinyFFTImageNet(torch.utils.data.Dataset):
              transforms.ToTensor(),
              transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
         ])
-        self.imgs = torchvision.datasets.ImageFolder(path, transform=pre_process)
+        self.imgs = torchvision.datasets.CIFAR10("/raid/projects/weustis/data/cifar10", train=train,download=True, transform=pre_process)
         self.fft_shape = (64, 33)
         h, w = self.fft_shape
         funcs = {
@@ -43,7 +43,9 @@ class TinyFFTImageNet(torch.utils.data.Dataset):
         self.token_idx =  torch.arange(h*w)[idx] # .reshape((-1, tok_dim))
         
         self.max_n_tok = len(self.token_idx)//tok_dim
-        
+        self.means = torch.load('means.pt')[0]
+        self.std = torch.load('std.pt')[0]
+ 
     def __len__(self):
         return len(self.imgs)
     
@@ -60,6 +62,8 @@ class TinyFFTImageNet(torch.utils.data.Dataset):
         x[:, e:2*e] = fft.imag
         x[:, 2*e:3*e] = fft.abs()
         x[:, 3*e:] = fft.angle()
+        x = x - self.means[:s]
+        x = x / self.std[:s]
         return x, label
         
     def l1_idx(self, r,c):
