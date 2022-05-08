@@ -7,8 +7,9 @@ from einops.layers.torch import Rearrange
 
 
 class Model(nn.Module):
-    def __init__(self, dim, num_classes, max_tok, dropout=0.):
+    def __init__(self, tok_dim, dim, num_classes, max_tok, dropout=0.):
         super().__init__()
+        self.to_tok = nn.Linear(tok_dim, dim)
         encoder_layer = nn.TransformerEncoderLayer(d_model=dim, nhead=8, activation='gelu', batch_first=True, norm_first=True)
         self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=6)
         self.fc = nn.Linear(dim, num_classes)
@@ -22,9 +23,8 @@ class Model(nn.Module):
         
 
     def forward(self, x):
-        print(x.shape)
         b, s, e = x.shape 
-        print(x.shape)
+        x = self.to_tok(x)
         x = torch.cat([self.cls_token.repeat(b, 1, 1), x], dim=1)
         x[:, 1:, :] = self.pos_embed[:s, :].repeat(b, 1, 1)
 

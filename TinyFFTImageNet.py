@@ -3,6 +3,7 @@ import numpy as np
 from tqdm import tqdm
 import torchvision
 from torchvision import transforms
+from einops import rearrange
 
 class TinyFFTImageNet(torch.utils.data.Dataset):
     def __init__(self, path, tok_dim, norm="L1", train=True):
@@ -51,8 +52,14 @@ class TinyFFTImageNet(torch.utils.data.Dataset):
         fft = torch.fft.rfft2(img, norm='forward')
         fft = fft.reshape(1,3,-1)
         fft = fft[:, :, self.token_idx] # reorder 
-        fft = fft.reshape(1, 3, -1, self.tok_dim)
-        return fft, label
+        fft = rearrange(fft, 'b c (s d) -> b s (c d)', d=self.tok_dim)[0]
+        s, e = fft.shape
+        x = torch.empty(s, e*4, dtype=torch.float)
+        x[:, :e] = fft.real
+        x[:, e:2*e] = fft.imag
+        x[:, 2*e:3*e] = fft.abs()
+        x[:, 3*e:] = fft.angle()
+        return x, label
         
     def l1_idx(self, r,c):
         cpn_r = r*(r+1)//2

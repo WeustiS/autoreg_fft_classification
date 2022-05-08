@@ -22,7 +22,7 @@ test_dataset = TinyFFTImageNet(r"/raid/projects/weustis/data/tiny-imagenet-200/t
 train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=CONFIG['batch_size'], shuffle=True, num_workers=CONFIG['num_workers'], pin_memory=True)
 test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=CONFIG['batch_size'], shuffle=True, num_workers=CONFIG['num_workers'], pin_memory=True)
 
-model = Model(CONFIG['dim'], CONFIG['n_classes'], train_dataset.max_n_tok)
+model = Model(CONFIG['dim']*3*4, CONFIG['n_classes'], train_dataset.max_n_tok)
 
 # Loss/Optimizer
 crit = torch.nn.CrossEntropyLoss()
