@@ -52,7 +52,7 @@ class TinyFFTImageNet(torch.utils.data.Dataset):
         fft = fft.reshape(1,3,-1)
         fft = fft[:, :, self.token_idx] # reorder 
         fft = fft.reshape(1, 3, -1, self.tok_dim)
-        return fft, label, ifft
+        return fft, label
         
     def l1_idx(self, r,c):
         cpn_r = r*(r+1)//2

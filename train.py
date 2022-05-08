@@ -14,15 +14,14 @@ if CONFIG["wandb"]:
     wandb.init(project="cs598", config=CONFIG)
 seed_everything(42)
           
-
-train_dataset = TinyFFTImageNet(r"C:\Users\willc\data\tiny-imagenet-200\train", 48, norm="L1")
-test_dataset = TinyFFTImageNet(r"C:\Users\willc\data\tiny-imagenet-200\test", 48, norm="L1", train=False)
+dims = [1, 2, 3, 6, 11, 12, 24, 33, 48, 64, 66, 96, 132, 192, 264, 352, 528, 704, 1056, 2112]
+assert CONFIG['dim'] in dims
+train_dataset = TinyFFTImageNet(r"/raid/projects/weustis/data/tiny-imagenet-200/train", CONFIG['dim'], norm="L1")
+test_dataset = TinyFFTImageNet(r"/raid/projects/weustis/data/tiny-imagenet-200/test", CONFIG['dim'], norm="L1", train=False)
 
 train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=CONFIG['batch_size'], shuffle=True, num_workers=CONFIG['num_workers'], pin_memory=True)
 test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=CONFIG['batch_size'], shuffle=True, num_workers=CONFIG['num_workers'], pin_memory=True)
 
-dims = [1, 2, 3, 6, 11, 12, 24, 33, 48, 64, 66, 96, 132, 192, 264, 352, 528, 704, 1056, 2112]
-assert CONFIG['dim'] in dims
 model = Model(CONFIG['dim'], CONFIG['n_classes'], train_dataset.max_n_tok)
 
 # Loss/Optimizer

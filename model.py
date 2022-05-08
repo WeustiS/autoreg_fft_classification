@@ -22,6 +22,7 @@ class Model(nn.Module):
         
 
     def forward(self, x):
+        print(x.shape)
         b, s, e = x.shape 
         print(x.shape)
         x = torch.cat([self.cls_token.repeat(b, 1, 1), x], dim=1)
