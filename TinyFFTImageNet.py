@@ -6,11 +6,11 @@ from torchvision import transforms
 from einops import rearrange
 
 class TinyFFTImageNet(torch.utils.data.Dataset):
-    def __init__(self, path, tok_dim, norm="L1", train=True):
-        
+    def __init__(self, path, n_tokens, tok_dim, norm="L1", train=True):
+        self.n_tokens = n_tokens
         pre_process = transforms.Compose([
              transforms.Resize(74),
-             transforms.RandomCrop(64),
+             transforms.CenterCrop(64),
              transforms.ToTensor(),
              transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
         ])
@@ -53,6 +53,7 @@ class TinyFFTImageNet(torch.utils.data.Dataset):
         fft = fft.reshape(1,3,-1)
         fft = fft[:, :, self.token_idx] # reorder 
         fft = rearrange(fft, 'b c (s d) -> b s (c d)', d=self.tok_dim)[0]
+        fft = fft[:self.n_tokens]
         s, e = fft.shape
         x = torch.empty(s, e*4, dtype=torch.float)
         x[:, :e] = fft.real

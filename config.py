@@ -1,8 +1,10 @@
 CONFIG = {
-    "batch_size": 10,
+    "batch_size": 512,
     "num_workers": 10,
-    "epochs": 1, 
+    'hidden_dim': 256,
+    "epochs": 50, 
     "wandb": True,
-    'dim': 64,
-    "n_classes": 1000
+    'dim': 33,
+    "n_tokens": 30,
+    "n_classes": 200
 } 
