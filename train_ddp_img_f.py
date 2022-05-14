@@ -1,15 +1,15 @@
 import torch
 from torch import nn
 
-from model import ViT
+from vit_pytorch import ViT
 from torchvision import transforms
 import torchvision
 from tqdm import tqdm
-from config import CONFIG
+from config import CONFIG_f as CONFIG
 
 import os
 
-from TinyFFTImageNet import TinyFFTImageNet
+from TinyTinyFFTImageNet import TinyFFTImageNet
 from utils import seed_everything, accuracy
 
 import sys
@@ -25,14 +25,15 @@ def cleanup():
     dist.destroy_process_group()
 
 def train(rank, world_size):
+    
     print(f"Starting DDP training on rank {rank}.")
     os.environ["MASTER_ADDR"] = "localhost"
-    os.environ["MASTER_PORT"] = "29500"
+    os.environ["MASTER_PORT"] = "29502"
     dist.init_process_group("gloo", rank=rank, world_size=world_size)
 
 
     seed_everything(42)
-    from config import CONFIG
+    from config import CONFIG_f as CONFIG
     if CONFIG["wandb"] and rank == 0:
         wandb.init(project="cs598", config=CONFIG)
                     
@@ -86,7 +87,8 @@ def train(rank, world_size):
     #     channels=12
     # ).cuda()
     patch_size = (CONFIG["patch_h"], CONFIG["patch_w"])
-    image_size = (64, 33)
+    patch_size = (8,8)
+    image_size = (64, 64)
     model = ViT(
         image_size=image_size,
         patch_size=patch_size,
@@ -95,7 +97,7 @@ def train(rank, world_size):
         heads=CONFIG['heads'],
         mlp_dim=CONFIG['hidden_dim']*4,
         num_classes=200,
-        channels=12,
+        channels=3,
         dropout=CONFIG['dropout']
     ).to(rank)
     model = DDP(model, device_ids=[rank])
@@ -129,9 +131,9 @@ def train(rank, world_size):
             x = x.to(rank)
             y = y.to(rank)
             #pred = model(x)
-            n_tok = torch.randint(low=3, high=n_tokens, size=(1,)).item()
+            # n_tok = torch.randint(low=3, high=n_tokens, size=(1,)).item()
 
-            pred = model((x, n_tok))
+            pred = model(x)
             loss = crit(pred, y)
 
             train_loss_total += loss.item()
@@ -151,7 +153,7 @@ def train(rank, world_size):
                     x = x.to(rank)
                     y = y.to(rank)
                     #pred = model(x)
-                    pred = model((x, n_tokens))
+                    pred = model(x)
                     loss = crit(pred, y)
                     test_loss_total += loss.item()
                     top1, top5 = accuracy(pred, y)

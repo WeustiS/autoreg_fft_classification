@@ -44,7 +44,7 @@ dataset = torchvision.datasets.ImageFolder(r"/raid/projects/weustis/data/tiny-im
 # test_dataset = torchvision.datasets.ImageFolder(r"/raid/projects/weustis/data/tiny-imagenet-200/test", transform=pre_process_test)
 l = len(dataset)
 
-train_dataset, test_dataset = torch.utils.data.random_split(dataset, [int(l*.9), l - int(l*.9)])
+train_dataset, test_dataset = torch.utils.data.random_split(dataset, [int(l*.9), l - int(l*.9)], generator=torch.Generator().manual_seed(42))
 
 train_dataset = TinyFFTImageNet(train_dataset, transforms=pre_process_train)
 test_dataset = TinyFFTImageNet(test_dataset, transforms=pre_process_test)
